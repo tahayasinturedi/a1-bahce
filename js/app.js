@@ -217,6 +217,7 @@ function artikel(){
     const ok = b.dataset.a === d.art;
     state.seen[d.id]=(state.seen[d.id]||0)+1;
     stage.querySelectorAll(".art-btn").forEach(x => { x.disabled = true; if(x.dataset.a===d.art) x.classList.add("correct"); });
+    if(!ok) b.classList.add("wrong");
     if(ok){ streak++; if(streak>state.best) state.best=streak; } else streak=0;
     save();
     say(d.art+" "+d.w);
