@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beyza'nın A1 Bahçesi</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A1 Bahçe">
+<meta name="theme-color" content="#2340E6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="daisies" width="46" height="34" patternUnits="userSpaceOnUse">
+      <g fill="#fff"><circle cx="10" cy="10" r="3"/><circle cx="16" cy="10" r="3"/><circle cx="13" cy="5" r="3"/><circle cx="13" cy="15" r="3"/></g>
+      <circle cx="13" cy="10" r="2.4" fill="#C5EFA0"/>
+      <g fill="#fff"><circle cx="33" cy="25" r="2.4"/><circle cx="38" cy="25" r="2.4"/><circle cx="35.5" cy="21" r="2.4"/><circle cx="35.5" cy="29" r="2.4"/></g>
+      <circle cx="35.5" cy="25" r="2" fill="#C5EFA0"/>
+    </pattern>
+    <symbol id="mill" viewBox="0 0 100 130">
+      <path d="M22 128 C22 70 30 46 50 40 C70 46 78 70 78 128 Z" fill="#2340E6" stroke="#1B1B2B" stroke-width="3"/>
+      <path d="M30 80 Q50 74 70 80 M27 100 Q50 94 73 100" stroke="#7FA0FF" stroke-width="4" fill="none"/>
+      <path d="M42 128 V108 Q50 98 58 108 V128 Z" fill="#EE3B24" stroke="#1B1B2B" stroke-width="2.5"/>
+      <g class="sails">
+        <rect x="47" y="-6" width="6" height="92" fill="#fff" stroke="#1B1B2B" stroke-width="2.5"/>
+        <rect x="4" y="37" width="92" height="6" fill="#fff" stroke="#1B1B2B" stroke-width="2.5"/>
+        <circle cx="50" cy="40" r="5" fill="#1B1B2B"/>
+      </g>
+    </symbol>
+    <symbol id="eyeSym" viewBox="0 0 60 36">
+      <path d="M4 20 Q30 -2 56 20 Q30 36 4 20Z" fill="#fff" stroke="#1B1B2B" stroke-width="3"/>
+      <circle cx="30" cy="19" r="7" fill="#1B1B2B"/>
+      <path d="M12 10 L8 3 M22 6 L20 -1 M32 5 V-2 M42 6 L44 -1 M50 10 L54 3" stroke="#1B1B2B" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+  <svg class="cloud" viewBox="0 0 200 90" style="width:200px;top:30px;left:-40px;opacity:.95" aria-hidden="true"><path d="M20 80 C-5 80 0 50 25 52 C25 25 60 20 72 38 C80 10 125 8 132 36 C150 22 185 35 175 60 C200 62 195 82 175 80Z"/></svg>
+  <svg class="cloud" viewBox="0 0 200 90" style="width:150px;top:12px;right:-30px;opacity:.85" aria-hidden="true"><path d="M20 80 C-5 80 0 50 25 52 C25 25 60 20 72 38 C80 10 125 8 132 36 C150 22 185 35 175 60 C200 62 195 82 175 80Z"/></svg>
+  <svg class="eye" style="width:40px;bottom:62px;left:44%;z-index:3" aria-hidden="true"><use href="#eyeSym"/></svg>
+
+  <div class="hero-inner">
+    <div>
+      <h1 class="hello">Hallo Beyza!<small>Start Deutsch 1 için kelime bahçen</small></h1>
+      <p>Her gün birkaç kelime ek. Kartlarla öğren, artikelleri çalış, quizle kendini dene. İlerlemen bu cihazda saklanır.</p>
+    </div>
+    <figure class="frame">
+      <span class="tape l"></span><span class="tape r"></span>
+      <img src="/assets/couple.jpg" alt="Beyza'nın çizdiği taha ve beyza illüstrasyonu" width="720" height="720">
+      <figcaption>taha ♥ beyza</figcaption>
+    </figure>
+  </div>
+
+  <svg class="land" viewBox="0 0 800 170" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <use href="#mill" x="80" y="6" width="70" height="92"/>
+    <use href="#mill" x="560" y="14" width="56" height="74"/>
+    <use href="#mill" x="690" y="30" width="44" height="58"/>
+    <path d="M0 95 C150 40 300 60 420 90 C540 120 660 60 800 80 V170 H0Z" fill="#2E9E6E"/>
+    <path d="M0 95 C150 40 300 60 420 90 C540 120 660 60 800 80 V170 H0Z" fill="url(#daisies)" opacity=".8"/>
+    <path d="M0 130 C120 100 260 110 380 135 C520 160 650 110 800 120 V170 H0Z" fill="#1E7F5C"/>
+    <path d="M0 130 C120 100 260 110 380 135 C520 160 650 110 800 120 V170 H0Z" fill="url(#daisies)" opacity=".55"/>
+  </svg>
+</header>
+
+<main>
+  <section class="progress" aria-label="İlerleme">
+    <div class="progress-row">
+      <strong id="progText">0 kelime</strong>
+      <span id="progTotal"></span>
+    </div>
+    <div class="bar"><span id="progBar"></span></div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-mode="lessons">Dersler</button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="cards">Kartlar</button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="repeat">Tekrar</button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="artikel">der · die · das</button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="quiz">Quiz</button>
+  </nav>
+
+  <section class="stage" id="stage" aria-live="polite"></section>
+
+  <div class="legend">
+    <span><b class="der">der</b> eril</span>
+    <span><b class="die">die</b> dişil</span>
+    <span><b class="das">das</b> nötr</span>
+  </div>
+</main>
+
+<script src="/js/words.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
