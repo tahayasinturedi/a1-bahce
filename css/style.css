@@ -35,8 +35,6 @@ button{font:inherit;cursor:pointer}
 .frame{position:relative;justify-self:center;width:min(300px,78vw);transform:rotate(3deg);background:#fff;padding:10px 10px 34px;box-shadow:0 10px 24px rgba(26,47,176,.22)}
 .frame img{display:block;width:100%;height:auto}
 .frame figcaption{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-family:var(--hand);font-size:24px;color:var(--cobalt)}
-/* Kalp karakter değil SVG: telefonlar ♥ karakterini kırmızı emojiye çeviriyor */
-.frame .heart{width:.62em;height:.57em;fill:currentColor;vertical-align:-.02em;margin:0 .08em}
 .tape{position:absolute;width:70px;height:22px;background:rgba(247,210,62,.85);top:-10px;transform:rotate(-8deg)}
 .tape.l{left:-14px}.tape.r{right:-14px;transform:rotate(10deg)}
 .cloud{position:absolute;z-index:1;fill:#fff}
