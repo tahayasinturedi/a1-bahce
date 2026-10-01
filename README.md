@@ -1,6 +1,6 @@
 # Beyza'nın A1 Bahçesi
 
-Start Deutsch 1 (A1) kelimelerini çalışmak için küçük bir PWA: ders kartları, der·die·das alıştırması, quiz ve yanlışları tekrar.
+Start Deutsch 1 (A1 sertifika) kelimelerini çalışmak için küçük bir PWA: ders kartları, der·die·das alıştırması, quiz ve yanlışları tekrar.
 
 ## Dosyalar
 
@@ -21,4 +21,4 @@ Service worker önce ağı denediği için normal içerik değişiklikleri zaten
 ## Kelime ekleme / silme
 
 Her kelimenin kimliği `artikel|kelime` şeklindedir (ör. `der|Apfel`). Listede sıra değişse de kayıtlı ilerleme bozulmaz.
-Bir kelimenin yazımını değiştirirsen o kelimenin ilerlemesi sıfırlanır.
+Bir kelimenin yazımını değiştirirsen eski kimliği `js/words.js` içindeki `ID_ALIASES`'a ekle (ör. `"|all-": "|alle"`); yoksa o kelimenin ilerlemesi sıfırlanır.

@@ -19,16 +19,25 @@ let state = load();
 function load(){
   try{
     const s = JSON.parse(localStorage.getItem(KEY));
-    if(s && s.known){ if(!Array.isArray(s.wrong)) s.wrong=[]; return s; }
+    if(s && s.known){ if(!Array.isArray(s.wrong)) s.wrong=[]; return applyAliases(s); }
     const legacy = migrateLegacy(JSON.parse(localStorage.getItem(LEGACY_KEY)));
     if(legacy) return legacy;
   }catch(e){}
   return {known:[], seen:{}, best:0, wrong:[]};
 }
-/* v1 kayıtları sıra numarası tutuyordu (0, 1, 2…); bunları kalıcı "artikel|kelime" kimliklerine çevir */
+/* Yazımı değişen kelimelerin kayıtlarını yeni kimliklerine taşı */
+function applyAliases(s){
+  const to = id => ID_ALIASES[id] || id;
+  const list = arr => [...new Set(arr.map(to))];
+  const seen = {};
+  for(const [id,count] of Object.entries(s.seen||{})) seen[to(id)] = (seen[to(id)]||0) + count;
+  return Object.assign(s, {known:list(s.known), wrong:list(s.wrong), seen});
+}
+/* v1 kayıtları sıra numarası tutuyordu (0, 1, 2…); bunları kalıcı "artikel|kelime" kimliklerine çevir.
+   O listedeki 368. kelime ("Grad (Celsius)") sonradan "das Grad" ile birleştirildi; sonrakiler bir sıra kaydı. */
 function migrateLegacy(s){
   if(!s || !Array.isArray(s.known)) return null;
-  const toId = n => DATA[n] ? DATA[n].id : null;
+  const toId = n => n===368 ? "das|Grad" : (DATA[n>368 ? n-1 : n]||{}).id || null;
   const ids = arr => (Array.isArray(arr) ? arr : []).map(toId).filter(Boolean);
   const seen = {};
   for(const [n,count] of Object.entries(s.seen||{})){ const id = toId(+n); if(id) seen[id]=count; }
