@@ -83,6 +83,25 @@ main{max-width:720px;margin:0 auto;padding:0 16px 48px}
 .all-words{list-style:none;margin:0;padding:4px 14px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px 16px;font-size:16px}
 .all-words li{overflow-wrap:anywhere}
 
+/* Ders hikâyesi */
+.story{margin:6px 14px 16px;padding-top:14px;border-top:2px dashed var(--sky)}
+.story-title{font-family:var(--hand);font-size:30px;line-height:1.05;color:var(--cobalt);margin:0 0 10px}
+.story-title small{display:block;font-family:var(--body);font-size:14px;font-weight:400;color:var(--muted);margin-top:4px}
+.story-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.story-tools .speak{margin-top:0}
+.story-tools .speak[aria-pressed="true"]{background:var(--cobalt);color:#fff}
+.story-p{margin:0 0 14px;font-size:18px;line-height:1.75;max-width:62ch}
+/* Türkçe kapalıyken cümleler paragraf gibi akar; açıkken her cümle kendi çevirisiyle alt alta */
+.sent-tr{display:none}
+.show-tr .sent{display:block;margin-bottom:10px}
+.show-tr .sent-tr{display:block;color:var(--muted);font-size:15px;line-height:1.5}
+.sw-tr{font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.sw-tr.art-der{text-decoration-color:var(--der)}.sw-tr.art-die{text-decoration-color:var(--die)}.sw-tr.art-das{text-decoration-color:var(--das)}.sw-tr.art-x{text-decoration-color:var(--muted)}
+.sw{font:inherit;font-weight:700;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.sw.art-der{text-decoration-color:var(--der)}.sw.art-die{text-decoration-color:var(--die)}.sw.art-das{text-decoration-color:var(--das)}.sw.art-x{text-decoration-color:var(--muted)}
+/* inline-block: üst öğenin alt çizgisi açıklamaya geçmesin */
+.sw[aria-expanded="true"]::after{content:"(" attr(data-tr) ")";font-weight:400;color:var(--muted);display:inline-block;margin-left:.3em}
+
 .stage{background:var(--paper);border:2.5px solid var(--cobalt);border-radius:22px 26px 20px 28px;padding:22px 18px;position:relative}
 .hint{color:var(--muted);margin:0 0 14px;font-size:15px}
 

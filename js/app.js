@@ -339,9 +339,60 @@ function allWords(){
     <p class="hint">Bir derse dokun, kelimeleri görünsün.</p>
     <div class="all-list">${LESSONS.map((pool,i)=>`
       <details class="all-lesson">
-        <summary><strong>Ders ${i+1}</strong><span>${pool.length} kelime</span></summary>
+        <summary><strong>Ders ${i+1}</strong><span>${pool.length} kelime${STORIES[i+1]?" · hikâye":""}</span></summary>
         <ul class="all-words">${pool.map(d=>`<li>${wordHTML(d)}</li>`).join("")}</ul>
+        ${STORIES[i+1] ? storyHTML(STORIES[i+1], pool) : ""}
       </details>`).join("")}</div>`;
+  stage.querySelectorAll(".story").forEach(bindStory);
+}
+
+/* {metin} / {metin=Kelime} işaretlerini dersin kelimelerine bağlar.
+   Almancada dokunulabilir buton (anlamı açılır), Türkçede sadece aynı renkte vurgu. */
+const STORY_MARK = /\{([^}=]+)(?:=([^}]+))?\}/g;
+function storyHTML(story, pool){
+  const find = (shown, base) => pool.find(x => x.w === (base || shown));
+  const markDe = text => esc(text).replace(STORY_MARK, (m, shown, base) => {
+    const d = find(shown, base);
+    return d ? `<button type="button" class="sw art-${d.art||"x"}" aria-expanded="false" data-tr="${esc(d.tr)}" title="${esc((d.art?d.art+" ":"")+d.w)}">${shown}</button>` : shown;
+  });
+  const markTr = text => esc(text).replace(STORY_MARK, (m, shown, base) => {
+    const d = find(shown, base);
+    return d ? `<b class="sw-tr art-${d.art||"x"}">${shown}</b>` : shown;
+  });
+  const plain = story.paragraphs.flat().map(([de]) => de.replace(STORY_MARK, "$1")).join(" ");
+  return `<section class="story" data-say="${esc(plain)}">
+    <h3 class="story-title">${esc(story.title)}<small>${esc(story.titleTr)}</small></h3>
+    <div class="story-tools">
+      <button type="button" class="speak story-listen">🔊 Dinle</button>
+      <button type="button" class="speak story-toggle" aria-pressed="false">Türkçesini göster</button>
+    </div>
+    <p class="hint">Vurgulu kelimeler bu dersten. Anlamını görmek için dokun.</p>
+    ${story.paragraphs.map(p => `<p class="story-p">${p.map(([de,tr]) =>
+      `<span class="sent"><span class="sent-de">${markDe(de)}</span> <span class="sent-tr">${markTr(tr)}</span></span>`).join(" ")}</p>`).join("")}
+  </section>`;
+}
+function bindStory(el){
+  el.addEventListener("click", e => {
+    const w = e.target.closest(".sw");
+    if(w){ w.setAttribute("aria-expanded", w.getAttribute("aria-expanded")!=="true"); return; }
+    if(e.target.closest(".story-listen")) return sayLong(el.dataset.say);
+    const t = e.target.closest(".story-toggle");
+    if(t){
+      const on = t.getAttribute("aria-pressed")!=="true";
+      t.setAttribute("aria-pressed", on);
+      t.textContent = on ? "Türkçesini gizle" : "Türkçesini göster";
+      el.classList.toggle("show-tr", on);
+    }
+  });
+}
+/* Uzun metni cümle cümle okut (bazı tarayıcılar tek parça uzun metni yarıda keser) */
+function sayLong(text){
+  if(!("speechSynthesis" in window)) return;
+  if(speechSynthesis.speaking){ speechSynthesis.cancel(); return; }
+  for(const s of text.match(/[^.!?“]+[.!?“]+/g) || [text]){
+    const u = new SpeechSynthesisUtterance(s.trim()); u.lang="de-DE"; u.rate=.85; if(deVoice) u.voice=deVoice;
+    speechSynthesis.speak(u);
+  }
 }
 
 const MODES = {lessons, cards, artikel, quiz, repeat, all:allWords};

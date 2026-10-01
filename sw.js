@@ -1,9 +1,10 @@
-const CACHE_NAME = "a1-bahce-v13";
+const CACHE_NAME = "a1-bahce-v14";
 const LOCAL_FILES = [
   "./",
   "index.html",
   "css/style.css",
   "js/words.js",
+  "js/stories.js",
   "js/app.js",
   "assets/couple.jpg",
   "manifest.json",
