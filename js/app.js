@@ -14,25 +14,59 @@ let activeMode = "lessons";
 let lastWordId = null;
 const KEY = "beyza-a1-v2";
 const LEGACY_KEY = "beyza-a1-v1";
+
+/* Aralıklı tekrar: takvim yok, ölçü Beyza'nın cevapladığı kart sayısı (state.step).
+   srs[id] = {s: üst üste doğru sayısı, due: kelimenin tekrar gelebileceği adım}.
+   GAPS[s] = s kez üst üste bilinen kelimenin kaç kart sonra tekrar geleceği. */
+const GAPS = [3, 10, 30, 80, 200];
+const KNOWN_STREAK = 3;
 let state = load();
 
 function load(){
+  let s = null;
   try{
-    const s = JSON.parse(localStorage.getItem(KEY));
-    if(s && s.known){ if(!Array.isArray(s.wrong)) s.wrong=[]; return applyAliases(s); }
-    const legacy = migrateLegacy(JSON.parse(localStorage.getItem(LEGACY_KEY)));
-    if(legacy) return legacy;
-  }catch(e){}
-  return {known:[], seen:{}, best:0, wrong:[]};
+    s = JSON.parse(localStorage.getItem(KEY));
+    if(!(s && (s.srs || s.known))) s = migrateLegacy(JSON.parse(localStorage.getItem(LEGACY_KEY)));
+  }catch(e){ s = null; }
+  return normalize(s || {});
+}
+function normalize(s){
+  s.seen = s.seen || {};
+  s.wrong = Array.isArray(s.wrong) ? s.wrong : [];
+  s.best = s.best || 0;
+  s.step = s.step || 0;
+  if(!s.srs) s.srs = srsFromKnown(s);
+  delete s.known;
+  return applyAliases(s);
+}
+/* Eski "öğrenildi" listesinden başlangıç durumu: öğrenilenler 3 kez bilinmiş sayılır (sayaç düşmesin),
+   tekrar tarihleri dağıtılır ki hepsi aynı anda gelmesin; görülen diğer kelimeler havuza "bilinmiyor" olarak girer. */
+function srsFromKnown(s){
+  const srs = {};
+  for(const id of Object.keys(s.seen)) srs[id] = {s:0, due:0};
+  for(const id of s.wrong) srs[id] = {s:0, due:0};
+  for(const id of (s.known||[])) srs[id] = {s:KNOWN_STREAK, due:GAPS[KNOWN_STREAK] + Math.floor(Math.random()*GAPS[4])};
+  return srs;
 }
 /* Yazımı değişen kelimelerin kayıtlarını yeni kimliklerine taşı */
 function applyAliases(s){
   const to = id => ID_ALIASES[id] || id;
-  const list = arr => [...new Set(arr.map(to))];
-  const seen = {};
-  for(const [id,count] of Object.entries(s.seen||{})) seen[to(id)] = (seen[to(id)]||0) + count;
-  return Object.assign(s, {known:list(s.known), wrong:list(s.wrong), seen});
+  const seen = {}, srs = {};
+  for(const [id,count] of Object.entries(s.seen)) seen[to(id)] = (seen[to(id)]||0) + count;
+  for(const [id,e] of Object.entries(s.srs)){ const k = to(id); if(!srs[k] || e.s > srs[k].s) srs[k] = e; }
+  return Object.assign(s, {wrong:[...new Set(s.wrong.map(to))], seen, srs});
 }
+const isKnown = id => ((state.srs[id]||{}).s||0) >= KNOWN_STREAK;
+/* Bir cevabı kaydet: doğruysa seri artar ve kelime daha geç gelir, yanlışsa seri sıfırlanır */
+function grade(id, ok){
+  state.step++;
+  const e = state.srs[id] || {s:0, due:0};
+  e.s = ok ? e.s + 1 : 0;
+  e.due = state.step + GAPS[Math.min(e.s, GAPS.length-1)];
+  state.srs[id] = e;
+}
+/* Ders kartlarında görülen kelime çalışma havuzuna girer */
+function addToPool(id){ if(!state.srs[id]) state.srs[id] = {s:0, due:state.step}; }
 /* v1 kayıtları sıra numarası tutuyordu (0, 1, 2…); bunları kalıcı "artikel|kelime" kimliklerine çevir.
    O listedeki 368. kelime ("Grad (Celsius)") sonradan "das Grad" ile birleştirildi; sonrakiler bir sıra kaydı. */
 function migrateLegacy(s){
@@ -55,7 +89,7 @@ function selectTab(mode){
 }
 
 function renderProgress(){
-  const n = state.known.length, t = DATA.length;
+  const n = DATA.filter(d=>isKnown(d.id)).length, t = DATA.length;
   $("#progText").textContent = n + " kelime öğrenildi";
   $("#progTotal").textContent = "toplam " + t;
   $("#progBar").style.width = (n/t*100)+"%";
@@ -63,7 +97,7 @@ function renderProgress(){
   if(repeatTab) repeatTab.textContent = `Tekrar · ${state.wrong.length}`;
 }
 
-function knownCount(pool){ return pool.filter(d=>state.known.includes(d.id)).length; }
+function knownCount(pool){ return pool.filter(d=>isKnown(d.id)).length; }
 
 function lessons(){
   activeMode = "lessons";
@@ -110,7 +144,7 @@ function repeat(){
 
 /* Bilinmeyenler öncelikli; az görülenler daha sık; az önce gösterilen kelime arka arkaya gelmez */
 function nextWord(pool){
-  const unknown = pool.filter(d=>!state.known.includes(d.id));
+  const unknown = pool.filter(d=>!isKnown(d.id));
   let src = unknown.length ? unknown : pool;
   if(src.length>1) src = src.filter(d=>d.id!==lastWordId);
   const weighted = src.map(d=>({d, w:1/(1+(state.seen[d.id]||0))}));
@@ -119,6 +153,23 @@ function nextWord(pool){
   for(const x of weighted){ r-=x.w; if(r<=0){ chosen = x.d; break; } }
   lastWordId = chosen.id;
   return chosen;
+}
+
+/* Kartlar sekmesi: sırası en erken gelen kelime (bilinmeyenler kısa, bilinenler uzun aralıkla);
+   eşitlerden rastgele biri, az önce gösterilen hariç */
+function srsPool(){ return DATA.filter(d=>state.srs[d.id]); }
+function srsNext(pool){
+  let src = pool.length>1 ? pool.filter(d=>d.id!==lastWordId) : pool;
+  const min = Math.min(...src.map(d=>state.srs[d.id].due));
+  const chosen = pick(src.filter(d=>state.srs[d.id].due===min));
+  lastWordId = chosen.id;
+  return chosen;
+}
+function streakLabel(id){
+  const e = state.srs[id];
+  if(!e || (e.s===0 && !state.seen[id])) return "yeni kelime";
+  if(e.s===0) return "henüz bilinmiyor";
+  return `${e.s} kez üst üste bildin` + (e.s>=KNOWN_STREAK ? " · öğrenildi" : "");
 }
 
 let deVoice = null;
@@ -148,26 +199,39 @@ function speakText(d){ return (d.art? d.art+" " : "") + d.w; }
 
 /* ---------- Kartlar ---------- */
 function cards(){
-  const pool = activePool;
+  /* Kartlar sekmesi = çalışma havuzu; ders ve Tekrar kendi listelerini kullanır */
+  const srsMode = activeMode==="cards" && activeLessonIndex===null;
+  const pool = srsMode ? srsPool() : activePool;
   if(!pool.length){
-    stage.innerHTML = `<p class="hint">${activeMode==="repeat"?"Tekrar edilecek yanlış cevabın kalmadı. Harika!":"Bu derste gösterilecek kelime kalmadı."}</p><div class="actions"><button class="btn next" id="backToLessons">Derslere dön</button></div>`;
+    const msg = activeMode==="repeat" ? "Tekrar edilecek yanlış cevabın kalmadı. Harika!"
+      : srsMode ? "Burada çalıştığın kelimeler toplanır. Başlamak için Dersler'den bir dersin kartlarını aç."
+      : "Bu derste gösterilecek kelime kalmadı.";
+    stage.innerHTML = `<p class="hint">${msg}</p><div class="actions"><button class="btn next" id="backToLessons">Derslere git</button></div>`;
     $("#backToLessons").onclick = lessons;
     return;
   }
-  const d = nextWord(pool);
+  const d = srsMode ? srsNext(pool) : nextWord(pool);
+  addToPool(d.id);
+  const label = streakLabel(d.id);
   state.seen[d.id]=(state.seen[d.id]||0)+1; save();
-    const lessonKnown = activeLessonIndex===null ? 0 : knownCount(pool);
+  const lessonKnown = activeLessonIndex===null ? 0 : knownCount(pool);
+  const status = activeMode==="repeat"
+    ? `<div class="lesson-card-status"><span>Tekrar · ${pool.length} yanlış kelime</span><button class="lesson-back" id="lessonBack" type="button">Dersler</button></div>`
+    : srsMode
+    ? `<div class="lesson-card-status"><span>Çalıştığın ${pool.length} kelime · ${knownCount(pool)} öğrenildi</span></div>`
+    : `<div class="lesson-card-status"><span>Ders ${activeLessonIndex+1}/${LESSONS.length} · ${lessonKnown}/${pool.length}</span><button class="lesson-back" id="lessonBack" type="button">Tüm dersler</button></div>${lessonKnown===pool.length?`<p class="lesson-complete">Bu ders tamamlandı; istersen tekrar çalışabilirsin.</p>`:""}`;
   const exampleLines = Math.ceil((d.ex||"").length/32)+Math.ceil((d.exTr||"").length/32);
   const cardHeight = Math.max(240,205+exampleLines*24);
   stage.innerHTML = `
-      ${activeMode==="repeat"?`<div class="lesson-card-status"><span>Tekrar · ${pool.length} yanlış kelime</span><button class="lesson-back" id="lessonBack" type="button">Dersler</button></div>`:activeLessonIndex===null?"":`<div class="lesson-card-status"><span>Ders ${activeLessonIndex+1}/${LESSONS.length} · ${lessonKnown}/${pool.length}</span><button class="lesson-back" id="lessonBack" type="button">Tüm dersler</button></div>${lessonKnown===pool.length?`<p class="lesson-complete">Bu ders tamamlandı; istersen tekrar çalışabilirsin.</p>`:""}`}
-    <p class="hint">Karta dokun, arkasını gör. Bildiğin kelimeleri işaretle, bilmediklerin daha sık gelir.</p>
+    ${status}
+    <p class="hint">Karta dokun, arkasını gör. Bildiğin kelimeler daha seyrek, bilmediklerin daha sık gelir.</p>
     <div class="card" id="card" role="button" tabindex="0" aria-label="Kartı çevir">
       <div class="card-inner" style="min-height:${cardHeight}px">
         <div class="face front">
           <div class="word">${wordHTML(d)}</div>
           ${d.pl?`<div class="plural">çoğul: ${esc(d.pl)}</div>`:""}
           <div class="flip-hint">dokun ve çevir</div>
+          <div class="word-state">${label}</div>
         </div>
         <div class="face back">
           <div class="tr">${esc(d.tr)}</div>
@@ -189,13 +253,13 @@ function cards(){
   card.addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); flip(); } });
   stage.querySelector(".speak").addEventListener("click", e => { e.stopPropagation(); say(d.ex); });
   $("#yes").onclick = () => {
-    if(!state.known.includes(d.id)) state.known.push(d.id);
+    grade(d.id, true);
     state.wrong = state.wrong.filter(id=>id!==d.id);
     save(); renderProgress();
     if(activeMode==="repeat") activePool=activePool.filter(word=>word.id!==d.id);
     cards();
   };
-  $("#no").onclick = () => { state.known = state.known.filter(x=>x!==d.id); save(); renderProgress(); cards(); };
+  $("#no").onclick = () => { grade(d.id, false); save(); renderProgress(); cards(); };
 }
 
 /* ---------- der · die · das ---------- */
@@ -252,8 +316,8 @@ function quiz(){
   stage.querySelectorAll(".opt").forEach(b => b.onclick = () => {
     const ok = b.dataset.id === d.id;
     state.seen[d.id]=(state.seen[d.id]||0)+1;
+    grade(d.id, ok);
     if(ok){
-      if(!state.known.includes(d.id)) state.known.push(d.id);
       state.wrong = state.wrong.filter(id=>id!==d.id);
     }else if(!state.wrong.includes(d.id)){
       state.wrong.push(d.id);
@@ -269,7 +333,18 @@ function quiz(){
   });
 }
 
-const MODES = {lessons, cards, artikel, quiz, repeat};
+/* ---------- Tümü: derslerin kelime listesi; ders kutusu yerinde açılır ---------- */
+function allWords(){
+  stage.innerHTML = `
+    <p class="hint">Bir derse dokun, kelimeleri görünsün.</p>
+    <div class="all-list">${LESSONS.map((pool,i)=>`
+      <details class="all-lesson">
+        <summary><strong>Ders ${i+1}</strong><span>${pool.length} kelime</span></summary>
+        <ul class="all-words">${pool.map(d=>`<li>${wordHTML(d)}</li>`).join("")}</ul>
+      </details>`).join("")}</div>`;
+}
+
+const MODES = {lessons, cards, artikel, quiz, repeat, all:allWords};
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   activeMode = t.dataset.mode;
   activeLessonIndex = null;

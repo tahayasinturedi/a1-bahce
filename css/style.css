@@ -71,6 +71,18 @@ main{max-width:720px;margin:0 auto;padding:0 16px 48px}
 .lesson-back{border:0;background:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:16px}
 .lesson-complete{text-align:center;margin:0 0 12px;color:var(--meadow);font-weight:700}
 
+/* Tümü: kapalı dersler ızgarada, açılan ders tam satıra büyür */
+.all-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.all-lesson{background:var(--paper);border:2px solid var(--sky);border-radius:16px}
+.all-lesson[open]{grid-column:1/-1;border-color:var(--cobalt)}
+.all-lesson summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:12px}
+.all-lesson[open] summary{flex-direction:row;justify-content:space-between;align-items:baseline}
+.all-lesson summary::-webkit-details-marker{display:none}
+.all-lesson summary strong{font-family:var(--hand);font-size:23px;color:var(--cobalt)}
+.all-lesson summary span{color:var(--muted);font-size:13px}
+.all-words{list-style:none;margin:0;padding:4px 14px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px 16px;font-size:16px}
+.all-words li{overflow-wrap:anywhere}
+
 .stage{background:var(--paper);border:2.5px solid var(--cobalt);border-radius:22px 26px 20px 28px;padding:22px 18px;position:relative}
 .hint{color:var(--muted);margin:0 0 14px;font-size:15px}
 
@@ -89,6 +101,7 @@ main{max-width:720px;margin:0 auto;padding:0 16px 48px}
 .ex-tr{margin:5px auto 0;color:var(--muted);font-size:15px;line-height:1.35;max-width:32ch}
 .speak{margin-top:14px;border:2px solid var(--cobalt);background:transparent;color:var(--cobalt);border-radius:999px;padding:6px 14px;font-size:15px}
 .flip-hint{margin-top:14px;color:var(--muted);font-size:14px}
+.word-state{margin-top:6px;color:var(--muted);font-size:13px;font-style:italic}
 
 .actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
 .btn{border:none;border-radius:14px;padding:12px 20px;font-weight:700;font-size:17px;min-width:140px}
