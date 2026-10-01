@@ -43,7 +43,7 @@ function lessons(){
   activeLessonIndex = null;
   activePool = DATA;
   stage.innerHTML = `
-    <p class="hint">${DATA.length} kelime; son ders 32 kelime. Bir ders seçerek başlayabilirsin.</p>
+    <p class="hint"> Rabb'im zihin açıklığı versin inşallah...</p>
     <div class="lessons-list">${LESSONS.map((pool,i)=>{
       const done = knownCount(pool), percent = done/pool.length*100;
       return `<div class="lesson-card${done===pool.length?" is-done":""}">
