@@ -274,7 +274,7 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
 renderProgress();
 lessons();
 
-/* Tek dosyalık sürüm file:// ile açıldığında service worker kaydedilemez */
+/* index.html doğrudan dosyadan (file://) açıldığında service worker kaydedilemez */
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
 }

@@ -1,16 +1,16 @@
-const CACHE_NAME = "a1-bahce-v12";
+const CACHE_NAME = "a1-bahce-v13";
 const LOCAL_FILES = [
-  "/",
-  "/index.html",
-  "/css/style.css",
-  "/js/words.js",
-  "/js/app.js",
-  "/assets/couple.jpg",
-  "/manifest.json",
-  "/apple-touch-icon.png",
-  "/icon-192.png",
-  "/icon-512.png",
-  "/icon.svg"
+  "./",
+  "index.html",
+  "css/style.css",
+  "js/words.js",
+  "js/app.js",
+  "assets/couple.jpg",
+  "manifest.json",
+  "apple-touch-icon.png",
+  "icon-192.png",
+  "icon-512.png",
+  "icon.svg"
 ];
 
 self.addEventListener("install", event => {

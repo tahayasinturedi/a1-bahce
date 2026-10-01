@@ -7,17 +7,16 @@ Start Deutsch 1 (A1) kelimelerini çalışmak için küçük bir PWA: ders kartl
 - `index.html`, `css/style.css`, `js/app.js`: uygulama
 - `js/words.js`: kelime listesi (`[artikel, kelime, çoğul, türkçe, örnek, tür]`)
 - `sw.js`: çevrimdışı çalışma için service worker
-- `beyza-a1.html`: internetsiz, tek dosyalık sürüm. **Otomatik üretilir, elle düzenleme.**
 
-## Geliştirme
+## Çalıştırma
 
-Build adımı yok; dosyaları herhangi bir statik sunucuyla yayınlamak yeterli.
+Build adımı yok, tüm yollar görelidir:
 
-Bir şey değiştirdikten sonra:
+- **Yerelde:** `index.html`'e çift tıkla (klasördeki diğer dosyalarla birlikte durmalı).
+- **Yayında:** Klasörü herhangi bir statik sunucuya koy (ör. GitHub Pages). Telefonda "Ana ekrana ekle" ile kurulur ve internetsiz de çalışır.
 
-1. Tek dosyalık sürümü yeniden üret: `node scripts/build-standalone.js`
-2. Önbelleğe alınan dosya listesini değiştirdiysen `sw.js` içindeki `CACHE_NAME` sürümünü artır.
-   (Service worker önce ağı denediği için normal içerik değişiklikleri zaten hemen yansır.)
+Önbelleğe alınan dosya listesini değiştirirsen `sw.js` içindeki `CACHE_NAME` sürümünü artır.
+Service worker önce ağı denediği için normal içerik değişiklikleri zaten hemen yansır.
 
 ## Kelime ekleme / silme
 
